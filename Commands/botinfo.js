@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const MessageEmbed = Discord.MessageEmbed;
 
-exports.command = function(msg,bot,botInfo) {
+exports.command = function(msg,bot,botInfo, otherInfo) {
   var uptime = Math.floor(bot.uptime/1000) // in seconds
   var endTString = ""; // normalized uptime in readable format
   if (Math.floor(uptime/(24*60*60)) > 0) { // days
@@ -19,7 +19,7 @@ exports.command = function(msg,bot,botInfo) {
     .setTitle("Bot's info & data")
     .setColor(0xd400ff)
     .setThumbnail(botInfo["AvatarURL"])
-    .addField("BASIC INFO", "**Join Date**: "+botInfo["JoinDate"]+"\n**Avatar URL**: "+botInfo["AvatarURL"]+"\n**Uptime**: "+endTString)
+    .addField("BASIC INFO", "**Join Date**: "+botInfo["JoinDate"]+"\n**Avatar URL**: "+botInfo["AvatarURL"]+"\n**Uptime**: "+endTString+"\n**Songs in playlist**: "+otherInfo.KewlSongs.length)
     .addField("USAGE", "**Servers**: "+botInfo["ServerCount"]+"\n**Users**: "+botInfo["ServingAmount"]+"\n**Emoji count**: "+Object.keys(botInfo["Emojis"]).length);
   msg.channel.send(embed)
     .catch(console.log);

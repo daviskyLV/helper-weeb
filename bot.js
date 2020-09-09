@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const request = require("request");
 const client = new Discord.Client();
 const PWInfo = require("../BotSecrets/PWInfo_HelpfulWeeb.js");
 const fs = require('fs');
@@ -8,6 +9,7 @@ const CmdsFolder = "./Commands/";
 const Presences = ["with w!help","with your waifu","on the bed uwu"];
 var PresenceTimer = 15; // how many seconds for the presence to change
 var StatsUpdateT = 600; // how often stats about global usage and server's stats should be updated
+var YoutubeAPIT = 3600; // how often the youtube api stuff is refreshed
 var Prefix = "w!"; // for commands
 var AdminPrefix = "wa!";
 var AdminId = {"243089691107262466":1};
@@ -15,6 +17,8 @@ var AdminId = {"243089691107262466":1};
 // Must be discord user ID!
 
 var BotInfo = {};
+var KewlSongs = [];
+var YTPlaylist = "PLE34DXLoeScDvm5HQxFo-LpHi9wk1-TmA";
 
 function Waiter(taim) { //taim is in seconds
   return new Promise(resolve => {
@@ -130,10 +134,34 @@ client.on('message', msg => {
     } else if (msg.content.substring(0,Prefix.length) == Prefix) { // basic command with prefix
       var cmd = (msg.content.split(/\s/g)[0]).substring(Prefix.length,msg.content.length).toLowerCase(); // the given command trimmed down to first whitespace
       if (commandList[cmd]) {
-        commandList[cmd].command(msg,client,BotInfo);
+        commandList[cmd].command(msg,client,BotInfo,{"KewlSongs":KewlSongs});
       }
     }
   }
 });
 
 client.login(PWInfo.Token);
+
+
+async function YoutubeAPILoop() {
+    function YoutubeGET(url) {
+        request(url, {json: true}, (err,res,body) => {
+            if (err) {return console.log(err);}
+            if (body.items) {
+                body.items.forEach((val, index) => {
+                    KewlSongs.push(val.snippet.resourceId.videoId);
+                });
+            }
+            if (body.nextPageToken) {
+                YoutubeGET("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId="+YTPlaylist+"&key="+PWInfo.YoutubeToken+"&pageToken="+body.nextPageToken);
+            }
+        });
+    }
+
+    while (true) {
+      KewlSongs = [];
+      YoutubeGET("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId="+YTPlaylist+"&key="+PWInfo.YoutubeToken);
+      await Waiter(YoutubeAPIT);
+    }
+}
+YoutubeAPILoop();
