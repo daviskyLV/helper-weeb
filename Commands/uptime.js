@@ -1,5 +1,4 @@
 const Discord = require('discord.js');
-const MessageEmbed = Discord.MessageEmbed;
 
 exports.command = function(msg,bot,botInfo) {
   var uptime = Math.floor(bot.uptime/1000) // in seconds

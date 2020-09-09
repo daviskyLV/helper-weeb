@@ -20,7 +20,7 @@ exports.command = function(msg,bot,botInfo, otherInfo) {
     .setColor(0xd400ff)
     .setThumbnail(botInfo["AvatarURL"])
     .addField("BASIC INFO", "**Join Date**: "+botInfo["JoinDate"]+"\n**Avatar URL**: "+botInfo["AvatarURL"]+"\n**Uptime**: "+endTString+"\n**Songs in playlist**: "+otherInfo.KewlSongs.length)
-    .addField("USAGE", "**Servers**: "+botInfo["ServerCount"]+"\n**Users**: "+botInfo["ServingAmount"]+"\n**Emoji count**: "+Object.keys(botInfo["Emojis"]).length);
+    .addField("USAGE", "**Servers**: "+botInfo["ServerCount"]+"\n**Users**: "+botInfo["ServingAmount"]);
   msg.channel.send(embed)
     .catch(console.log);
 }

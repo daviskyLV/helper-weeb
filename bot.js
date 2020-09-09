@@ -3,22 +3,12 @@ const request = require("request");
 const client = new Discord.Client();
 const PWInfo = require("../BotSecrets/PWInfo_HelpfulWeeb.js");
 const fs = require('fs');
+const Settings = require("./Settings.js");
 
 const CmdsFolder = "./Commands/";
 
-const Presences = ["with w!help","with your waifu","on the bed uwu"];
-var PresenceTimer = 15; // how many seconds for the presence to change
-var StatsUpdateT = 600; // how often stats about global usage and server's stats should be updated
-var YoutubeAPIT = 3600; // how often the youtube api stuff is refreshed
-var Prefix = "w!"; // for commands
-var AdminPrefix = "wa!";
-var AdminId = {"243089691107262466":1};
-// Can use admin commands (to shutdown,restart,etc the bot)
-// Must be discord user ID!
-
 var BotInfo = {};
 var KewlSongs = [];
-var YTPlaylist = "PLE34DXLoeScDvm5HQxFo-LpHi9wk1-TmA";
 
 function Waiter(taim) { //taim is in seconds
   return new Promise(resolve => {
@@ -87,21 +77,17 @@ client.on('ready', () => {
   BotInfo["AvatarURL"] = client.user.displayAvatarURL();
   BotInfo["ServerCount"] = client.guilds.cache.size;
   BotInfo["ServingAmount"] = 0;
-  BotInfo["Emojis"] = {};
   client.guilds.cache.forEach(serv => {
     BotInfo["ServingAmount"] = BotInfo["ServingAmount"]+serv.members.cache.filter(member => member.user.bot === false).size;
-    serv.emojis.cache.forEach(emoji => {
-      BotInfo["Emojis"][emoji.id] = emoji;
-    });
   });
 
   async function PresenceLoop() {
     var cur = 0;
     while (true) {
-      client.user.setPresence({ activity: { name: Presences[cur], type: 0 }, status: 'online' })
+      client.user.setPresence({ activity: { name: Settings.Presences[cur], type: 0 }, status: 'online' })
         .catch(console.log);
-      await Waiter(PresenceTimer);
-      if (cur >= Presences.length-1) {
+      await Waiter(Settings.PresenceTimer);
+      if (cur >= Settings.Presences.length-1) {
         cur = 0;
       } else {cur++;}
     }
@@ -109,15 +95,11 @@ client.on('ready', () => {
   PresenceLoop();
   async function StatsLoop() {
     while (true) {
-      await Waiter(StatsUpdateT);
+      await Waiter(Settings.StatsUpdateT);
       BotInfo["ServerCount"] = client.guilds.cache.size;
       BotInfo["ServingAmount"] = 0;
-      BotInfo["Emojis"] = {};
       client.guilds.cache.forEach(serv => {
         BotInfo["ServingAmount"] = BotInfo["ServingAmount"]+serv.members.cache.filter(member => member.user.bot === false).size;
-        serv.emojis.cache.forEach(emoji => {
-          BotInfo["Emojis"][emoji.id] = emoji;
-        });
       });
     }
   }
@@ -126,13 +108,13 @@ client.on('ready', () => {
 
 client.on('message', msg => {
   if (!msg.author.bot && !Frozen) {
-    if (msg.content.substring(0,AdminPrefix.length) == AdminPrefix) { // admin command with prefix
-      var cmd = (msg.content.split(/\s/g)[0]).substring(AdminPrefix.length,msg.content.length).toLowerCase(); // the given command trimmed down to first whitespace
+    if (msg.content.substring(0,Settings.AdminPrefix.length) == Settings.AdminPrefix && Settings.AdminId[msg.author.id.toString()]) { // admin command with prefix
+      var cmd = (msg.content.split(/\s/g)[0]).substring(Settings.AdminPrefix.length,msg.content.length).toLowerCase(); // the given command trimmed down to first whitespace
       if (AdminCmds[cmd]) {
         AdminCmds[cmd](msg);
       }
-    } else if (msg.content.substring(0,Prefix.length) == Prefix) { // basic command with prefix
-      var cmd = (msg.content.split(/\s/g)[0]).substring(Prefix.length,msg.content.length).toLowerCase(); // the given command trimmed down to first whitespace
+    } else if (msg.content.substring(0,Settings.Prefix.length) == Settings.Prefix) { // basic command with prefix
+      var cmd = (msg.content.split(/\s/g)[0]).substring(Settings.Prefix.length,msg.content.length).toLowerCase(); // the given command trimmed down to first whitespace
       if (commandList[cmd]) {
         commandList[cmd].command(msg,client,BotInfo,{"KewlSongs":KewlSongs});
       }
@@ -143,6 +125,7 @@ client.on('message', msg => {
 client.login(PWInfo.Token);
 
 
+/// LOOPS ///
 async function YoutubeAPILoop() {
     function YoutubeGET(url) {
         request(url, {json: true}, (err,res,body) => {
@@ -153,15 +136,15 @@ async function YoutubeAPILoop() {
                 });
             }
             if (body.nextPageToken) {
-                YoutubeGET("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId="+YTPlaylist+"&key="+PWInfo.YoutubeToken+"&pageToken="+body.nextPageToken);
+                YoutubeGET("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId="+Settings.YTPlaylist+"&key="+PWInfo.YoutubeToken+"&pageToken="+body.nextPageToken);
             }
         });
     }
 
     while (true) {
       KewlSongs = [];
-      YoutubeGET("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId="+YTPlaylist+"&key="+PWInfo.YoutubeToken);
-      await Waiter(YoutubeAPIT);
+      YoutubeGET("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId="+Settings.YTPlaylist+"&key="+PWInfo.YoutubeToken);
+      await Waiter(Settings.YoutubeAPIT);
     }
 }
 YoutubeAPILoop();
