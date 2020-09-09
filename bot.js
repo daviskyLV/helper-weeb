@@ -81,8 +81,12 @@ client.on('ready', () => {
   BotInfo["AvatarURL"] = client.user.displayAvatarURL();
   BotInfo["ServerCount"] = client.guilds.cache.size;
   BotInfo["ServingAmount"] = 0;
+  BotInfo["Emojis"] = {};
   client.guilds.cache.forEach(serv => {
-    BotInfo["ServingAmount"] = BotInfo["ServingAmount"]+serv.members.cache.filter(member => member.bot === false);
+    BotInfo["ServingAmount"] = BotInfo["ServingAmount"]+serv.members.cache.filter(member => member.bot === false).size;
+    serv.emojis.cache.forEach(emoji => {
+      BotInfo["Emojis"][emoji.id] = emoji;
+    });
     console.log(serv);
   });
 
@@ -103,9 +107,13 @@ client.on('ready', () => {
       await Waiter(StatsUpdateT);
       BotInfo["ServerCount"] = client.guilds.cache.size;
       BotInfo["ServingAmount"] = 0;
+      BotInfo["Emojis"] = {};
       client.guilds.cache.forEach(serv => {
-        BotInfo["ServingAmount"] = BotInfo["ServingAmount"]+serv.members.cache.filter(member => member.bot === false);
-        console.log(serv);
+        BotInfo["ServingAmount"] = BotInfo["ServingAmount"]+serv.members.cache.filter(member => member.bot === false).size;
+        serv.emojis.cache.forEach(emoji => {
+          BotInfo["Emojis"][emoji.id] = emoji;
+          console.log(emoji);
+        });
       });
     }
   }
