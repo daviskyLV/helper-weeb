@@ -7,7 +7,7 @@ const CmdsFolder = "./Commands/";
 
 const Presences = ["with w!help","with your waifu","on the bed uwu"];
 var PresenceTimer = 15; // how many seconds for the presence to change
-var StatsUpdateT = 60; // how often stats about global usage and server's stats should be updated
+var StatsUpdateT = 600; // how often stats about global usage and server's stats should be updated
 var Prefix = "w!"; // for commands
 var AdminPrefix = "wa!";
 var AdminId = {"243089691107262466":1};
@@ -69,6 +69,8 @@ var AdminCmds = {
 
     setTimeout((function() {
       Frozen = false;
+      msg.channel.send("Bot restarted!")
+        .catch(console.log);
       return true;
     }), 15000);
   }
@@ -83,10 +85,9 @@ client.on('ready', () => {
   BotInfo["ServingAmount"] = 0;
   BotInfo["Emojis"] = {};
   client.guilds.cache.forEach(serv => {
-    BotInfo["ServingAmount"] = BotInfo["ServingAmount"]+serv.members.cache.filter(member => member.bot === false).size;
+    BotInfo["ServingAmount"] = BotInfo["ServingAmount"]+serv.members.cache.filter(member => member.user.bot === false).size;
     serv.emojis.cache.forEach(emoji => {
       BotInfo["Emojis"][emoji.id] = emoji;
-      console.log(emoji);
     });
   });
 
@@ -109,10 +110,9 @@ client.on('ready', () => {
       BotInfo["ServingAmount"] = 0;
       BotInfo["Emojis"] = {};
       client.guilds.cache.forEach(serv => {
-        BotInfo["ServingAmount"] = BotInfo["ServingAmount"]+serv.members.cache.filter(member => member.bot === false).size;
+        BotInfo["ServingAmount"] = BotInfo["ServingAmount"]+serv.members.cache.filter(member => member.user.bot === false).size;
         serv.emojis.cache.forEach(emoji => {
           BotInfo["Emojis"][emoji.id] = emoji;
-          console.log(emoji);
         });
       });
     }
