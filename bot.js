@@ -7,6 +7,7 @@ const CmdsFolder = "./Commands/";
 
 const Presences = ["with w!help","with your waifu","on the bed uwu"];
 var PresenceTimer = 15; // how many seconds for the presence to change
+var StatsUpdateT = 60; // how often stats about global usage and server's stats should be updated
 var Prefix = "w!"; // for commands
 var AdminPrefix = "wa!";
 var AdminId = {"243089691107262466":1};
@@ -54,6 +55,8 @@ var AdminCmds = {
     Frozen = true;
     console.log("Restarting the bot! Action taken by: "+msg.author.id);
     console.log("BotInfo: ",BotInfo);
+    msg.channel.send("Restarting the bot! Should take up to 15 seconds")
+      .catch(console.log);
 
     fs.readdir(CmdsFolder, (err, files) => {
       files.forEach(file => {
@@ -67,7 +70,7 @@ var AdminCmds = {
     setTimeout((function() {
       Frozen = false;
       return true;
-    }), 5000);
+    }), 15000);
   }
 };
 
@@ -77,7 +80,11 @@ client.on('ready', () => {
   BotInfo["JoinDate"] = client.user.createdAt.toUTCString();
   BotInfo["AvatarURL"] = client.user.displayAvatarURL();
   BotInfo["ServerCount"] = client.guilds.cache.size;
-  console.log(client.guilds.cache);
+  BotInfo["ServingAmount"] = 0;
+  client.guilds.cache.forEach(serv => {
+    BotInfo["ServingAmount"] = BotInfo["ServingAmount"]+serv.members.cache.filter(member => member.bot === false);
+    console.log(serv);
+  });
 
   async function PresenceLoop() {
     var cur = 0;
@@ -88,10 +95,20 @@ client.on('ready', () => {
       if (cur >= Presences.length-1) {
         cur = 0;
       } else {cur++;}
-      BotInfo["ServerCount"] = client.guilds.cache.size;
     }
   }
   PresenceLoop();
+  async function StatsLoop() {
+    while (true) {
+      await Waiter(StatsUpdateT);
+      BotInfo["ServerCount"] = client.guilds.cache.size;
+      BotInfo["ServingAmount"] = 0;
+      client.guilds.cache.forEach(serv => {
+        BotInfo["ServingAmount"] = BotInfo["ServingAmount"]+serv.members.cache.filter(member => member.bot === false);
+        console.log(serv);
+      });
+    }
+  }
 });
 
 client.on('message', msg => {
