@@ -83,10 +83,9 @@ client.on('ready', () => {
   BotInfo["ServingAmount"] = 0;
   BotInfo["Emojis"] = {};
   client.guilds.cache.forEach(serv => {
-    BotInfo["ServingAmount"] = BotInfo["ServingAmount"]+serv.members.cache.filter(member => member.bot === false).size;
+    BotInfo["ServingAmount"] = BotInfo["ServingAmount"]+serv.members.cache.filter(member => member.user.bot === false).size;
     serv.emojis.cache.forEach(emoji => {
       BotInfo["Emojis"][emoji.id] = emoji;
-      console.log(emoji);
     });
   });
 
@@ -109,10 +108,9 @@ client.on('ready', () => {
       BotInfo["ServingAmount"] = 0;
       BotInfo["Emojis"] = {};
       client.guilds.cache.forEach(serv => {
-        BotInfo["ServingAmount"] = BotInfo["ServingAmount"]+serv.members.cache.filter(member => member.bot === false).size;
+        BotInfo["ServingAmount"] = BotInfo["ServingAmount"]+serv.members.cache.filter(member => member.user.bot === false).size;
         serv.emojis.cache.forEach(emoji => {
           BotInfo["Emojis"][emoji.id] = emoji;
-          console.log(emoji);
         });
       });
     }

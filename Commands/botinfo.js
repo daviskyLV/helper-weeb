@@ -19,8 +19,8 @@ exports.command = function(msg,bot,botInfo) {
     .setTitle("Bot's info & data")
     .setColor(0xd400ff)
     .setThumbnail(botInfo["AvatarURL"])
-    .addField("Basic info", "**Join Date**: "+botInfo["JoinDate"]+"\n**Avatar URL**: "+botInfo["AvatarURL"]+"\n**Uptime**: "+endTString)
-    .addField("Usage", "**Servers**: "+botInfo["ServerCount"]+"\n**Users**: "+botInfo["ServingAmount"].size+"\n**Emoji count**: "+botInfo["Emojis"].size);
+    .addField("BASIC INFO", "**Join Date**: "+botInfo["JoinDate"]+"\n**Avatar URL**: "+botInfo["AvatarURL"]+"\n**Uptime**: "+endTString)
+    .addField("USAGE", "**Servers**: "+botInfo["ServerCount"]+"\n**Users**: "+botInfo["ServingAmount"]+"\n**Emoji count**: "+Object.keys(botInfo["Emojis"]).length);
   msg.channel.send(embed)
     .catch(console.log);
 }
