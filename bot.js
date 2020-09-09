@@ -86,8 +86,8 @@ client.on('ready', () => {
     BotInfo["ServingAmount"] = BotInfo["ServingAmount"]+serv.members.cache.filter(member => member.bot === false).size;
     serv.emojis.cache.forEach(emoji => {
       BotInfo["Emojis"][emoji.id] = emoji;
+      console.log(emoji);
     });
-    console.log(serv);
   });
 
   async function PresenceLoop() {
@@ -117,6 +117,7 @@ client.on('ready', () => {
       });
     }
   }
+  StatsLoop();
 });
 
 client.on('message', msg => {
