@@ -1,0 +1,11 @@
+{
+  "name": "HelpfulWeeb",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "dependencies": {
+    "discord.js": "^12.x"
+  }
+}
