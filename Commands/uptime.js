@@ -15,12 +15,6 @@ exports.command = function(msg,bot,botInfo) {
   }
   endTString = endTString+(uptime%60)+"s";
 
-  const embed = new MessageEmbed()
-    .setTitle("Bot's info & data")
-    .setColor(0xd400ff)
-    .setThumbnail(botInfo["AvatarURL"])
-    .addField("Basic info", "**Join Date**: "+botInfo["JoinDate"]+"\n**Avatar URL**: "+botInfo["AvatarURL"]+"\n**Uptime**: "+endTString)
-    .addField("Usage", "**Servers**: "+botInfo["ServerCount"]);
-  msg.channel.send(embed)
+  msg.channel.send("Bot's uptime: "+endTString)
     .catch(console.log);
 }
