@@ -6,10 +6,12 @@ const fs = require('fs');
 const Settings = require("./Settings.js");
 
 const CmdsFolder = "./Commands/";
+const ListenerFolder = "./ListenerCmds/";
 
 var BotInfo = {};
 var KewlSongs = [];
 
+// USEFUL FUNCTIONS
 function Waiter(taim) { //taim is in seconds
   return new Promise(resolve => {
     setTimeout(() => {
@@ -22,8 +24,11 @@ function requireUncached(module) {
     return require(module);
 }
 
+
+// COMMAND LOADING
 var Frozen = false;
 var commandList = {};
+var listenerCmds = {};
 fs.readdir(CmdsFolder, (err, files) => {
   files.forEach(file => {
     if (file.substring(file.length-3,file.length)) {
@@ -32,7 +37,17 @@ fs.readdir(CmdsFolder, (err, files) => {
     }
   });
 });
+fs.readdir(ListenerFolder, (err, files) => {
+  files.forEach(file => {
+    if (file.substring(file.length-3,file.length)) {
+      listenerCmds[file.substring(0,file.length-3)] = require(ListenerFolder+file);
+      console.log("added listener: "+file.substring(0,file.length-3));
+    }
+  });
+});
 
+
+// ADMIN COMMANDS
 var AdminCmds = {
   "exit": function(msg) {
     Frozen = true;
@@ -60,6 +75,14 @@ var AdminCmds = {
         }
       });
     });
+    fs.readdir(ListenerFolder, (err, files) => {
+      files.forEach(file => {
+        if (file.substring(file.length-3,file.length)) {
+          listenerCmds[file.substring(0,file.length-3)] = requireUncached(ListenerFolder+file);
+          console.log("added listener: "+file.substring(0,file.length-3));
+        }
+      });
+    });
 
     setTimeout((function() {
       Frozen = false;
@@ -70,6 +93,8 @@ var AdminCmds = {
   }
 };
 
+
+// STARTUP
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 
@@ -106,6 +131,8 @@ client.on('ready', () => {
   StatsLoop();
 });
 
+
+// MESSAGE DETECTION
 client.on('message', msg => {
   if (!msg.author.bot && !Frozen) {
     if (msg.content.substring(0,Settings.AdminPrefix.length) == Settings.AdminPrefix && Settings.AdminId[msg.author.id.toString()]) { // admin command with prefix
@@ -118,6 +145,10 @@ client.on('message', msg => {
       if (commandList[cmd]) {
         commandList[cmd].command(msg,client,BotInfo,{"KewlSongs":KewlSongs});
       }
+    } else {
+      Object.keys(listenerCmds).forEach(function(key) {
+        listenerCmds[key].listened(msg, client, BotInfo, {"KewlSongs":KewlSongs});
+      });
     }
   }
 });
@@ -147,4 +178,4 @@ async function YoutubeAPILoop() {
       await Waiter(Settings.YoutubeAPIT);
     }
 }
-YoutubeAPILoop();
+//YoutubeAPILoop();
