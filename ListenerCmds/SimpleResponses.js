@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 
 exports.listened = function(msg,bot,botInfo, otherInfo) {
   // simple message matching
-  var msgMatch = {
+  let msgMatch = {
     // "matching message": "response message"
     "owo": "What's this?"
   }
